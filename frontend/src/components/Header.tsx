@@ -2,6 +2,7 @@ import React from 'react';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import logo from '../assets/logodark.svg';
+import Logo from './Logo';
 
 // interface NavbarProps {
 //   isLoggedIn: boolean;
@@ -15,7 +16,7 @@ const Header: React.FC = () => {
         <Container>
           <LinkContainer to='/'>
             <Navbar.Brand>
-              <img src={logo} id='logo' alt='Office Assistant' />
+              <Logo logoSrc={logo} />
             </Navbar.Brand>
           </LinkContainer>
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
