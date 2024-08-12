@@ -39,7 +39,7 @@ const LoginScreen: React.FC = () => {
       <Row className='py-3'>
         <Col>
           New Customer?{' '}
-          <Link to='/' className='text-decoration-none'>
+          <Link to='/register' className='text-decoration-none'>
             Register here
           </Link>
         </Col>
