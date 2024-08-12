@@ -1,0 +1,33 @@
+import React, { useState, useEffect, useRef } from 'react';
+import ChatMessage from './ChatMessage';
+import ChatInput from './ChatInput';
+import { Card } from 'react-bootstrap';
+import { processUserMessage, Message as MessageType } from '../utils/chatUtils';
+
+const ChatWindow: React.FC = () => {
+  const [messages, setMessages] = useState<MessageType[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const handleSendMessage = (message: string) => {
+    processUserMessage(message, setMessages);
+  };
+
+  return (
+    <Card className='chat-window w-75 shadow-lg'>
+      <Card.Body
+        className='message-container overflow-auto p-3'
+        style={{ height: '70vh' }}
+      >
+        {messages.map((msg, index) => (
+          <ChatMessage key={index} text={msg.text} sender={msg.sender} />
+        ))}
+        <div ref={messagesEndRef} />
+      </Card.Body>
+      <Card.Footer>
+        <ChatInput onSendMessage={handleSendMessage} />
+      </Card.Footer>
+    </Card>
+  );
+};
+
+export default ChatWindow;

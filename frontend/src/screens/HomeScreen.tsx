@@ -1,7 +1,14 @@
 import React from 'react';
 import { Container, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate('/chat');
+  };
+
   return (
     <Container className='d-flex flex-column justify-content-center align-items-center text-center mt-5 py-5'>
       <h1 className='my-5'>Welcome to Office Assistant</h1>
@@ -15,7 +22,7 @@ const HomePage: React.FC = () => {
         day or week. The robot also allows voice-activated appointment
         check-ins.
       </p>
-      <Button variant='dark' size='lg' className='mb-5'>
+      <Button variant='dark' size='lg' className='mb-5' onClick={handleClick}>
         Chat Now
       </Button>
     </Container>

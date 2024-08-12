@@ -6,7 +6,7 @@ const Footer: React.FC = () => {
   return (
     <>
       <footer className='footer text-center text-lg-start'>
-        <div className='text-center py-5 fs-5'>
+        <div className='text-center py-3 fs-5'>
           <p>
             Office Assistant &copy; {currentYear}
             <a
