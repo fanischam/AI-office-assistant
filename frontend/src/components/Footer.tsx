@@ -1,18 +1,25 @@
 import React from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { FaGithub } from 'react-icons/fa';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
   return (
-    <footer>
-      <Container>
-        <Row>
-          <Col className='text-center py-5 fs-5'>
-            <p>AI office assistant &copy; {currentYear}</p>
-          </Col>
-        </Row>
-      </Container>
-    </footer>
+    <>
+      <footer className='bg-body-tertiary text-center text-lg-start'>
+        <div className='text-center py-5 fs-5'>
+          <p>
+            AI office assistant &copy; {currentYear}
+            <a
+              className='text-body text-decoration-none d-flex justify-content-center align-items-center mt-3'
+              href='https://github.com/fanischam/AI-office-assistant'
+            >
+              {' '}
+              <FaGithub />
+            </a>
+          </p>
+        </div>
+      </footer>
+    </>
   );
 };
 
