@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "./backend/dist", // Output directory for compiled JavaScript files
+    "rootDir": "./backend", // Root directory of your TypeScript source files
+    "target": "ES6", // JavaScript version
+    "module": "commonjs", // Module system
+    "strict": true, // Enable all strict type-checking options
+    "esModuleInterop": true, // Allows default imports from modules with no default export
+    "skipLibCheck": true, // Skip type checking of declaration files
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "backend/**/*.ts" // Include all TypeScript files in the backend folder
+  ]
+}
