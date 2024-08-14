@@ -6,14 +6,14 @@ const Footer: React.FC = () => {
   return (
     <>
       <footer className='footer text-center text-lg-start'>
-        <div className='text-center py-3 fs-5'>
+        <div className='text-center py-5 fs-5'>
           <p>
             Office Assistant &copy; {currentYear}
+            <br />
             <a
-              className='text-body text-decoration-none d-flex justify-content-center align-items-center mt-3'
+              className='text-body text-decoration-none '
               href='https://github.com/fanischam/AI-office-assistant'
             >
-              {' '}
               <FaGithub />
             </a>
           </p>
