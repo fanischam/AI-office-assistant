@@ -1,12 +1,16 @@
 import React from 'react';
 import { Container, Button } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { RootState } from '../types/storeTypes';
 
 const HomePage: React.FC = () => {
+  const { userInfo } = useSelector((state: RootState) => state.auth);
+
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/chat');
+    navigate(userInfo ? '/chat' : '/login');
   };
 
   return (
@@ -23,7 +27,7 @@ const HomePage: React.FC = () => {
         check-ins.
       </p>
       <Button variant='dark' size='lg' className='mb-5' onClick={handleClick}>
-        Chat Now
+        {userInfo ? 'Chat Now' : 'Login'}
       </Button>
     </Container>
   );

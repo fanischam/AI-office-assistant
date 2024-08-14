@@ -44,7 +44,10 @@ const Header: React.FC = () => {
                   <LinkContainer to='/chat'>
                     <Nav.Link className='me-3 fs-4 text-light'>Chat</Nav.Link>
                   </LinkContainer>
-                  <NavDropdown title={userInfo.name} id='username'>
+                  <NavDropdown
+                    className='fs-4 text-light'
+                    title={userInfo.name}
+                  >
                     <LinkContainer to='/profile'>
                       <NavDropdown.Item>Profile</NavDropdown.Item>
                     </LinkContainer>

@@ -37,7 +37,7 @@ const LoginScreen: React.FC = () => {
       dispatch(setCredentials(res));
       navigate(redirect);
     } catch (error: any) {
-      toast.error(error?.data?.message || error.error);
+      toast.error('Invalid email or password');
     }
   };
 
