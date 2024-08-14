@@ -8,6 +8,7 @@ import { RootState } from '../types/storeTypes';
 import Logo from './Logo';
 import logo from '../assets/logodark.svg';
 import { logout } from '../slices/authSlice';
+import { toast } from 'react-toastify';
 
 const Header: React.FC = () => {
   const { userInfo } = useSelector((state: RootState) => state.auth);
@@ -22,6 +23,7 @@ const Header: React.FC = () => {
       await logoutApiCall({}).unwrap();
       dispatch(logout());
       navigate('/');
+      toast.info('Logged out succesfully');
     } catch (error) {
       console.log(error);
     }
