@@ -1,15 +1,32 @@
 import React from 'react';
-import { Container, Nav, Navbar } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-import logo from '../assets/logodark.svg';
+import { useSelector, useDispatch } from 'react-redux';
+import { useLogoutMutation } from '../slices/usersApiSlice';
+import { RootState } from '../types/storeTypes';
 import Logo from './Logo';
-
-// interface NavbarProps {
-//   isLoggedIn: boolean;
-//   onLogout: () => void;
-// }
+import logo from '../assets/logodark.svg';
+import { logout } from '../slices/authSlice';
 
 const Header: React.FC = () => {
+  const { userInfo } = useSelector((state: RootState) => state.auth);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [logoutApiCall] = useLogoutMutation();
+
+  const logoutHandler = async () => {
+    try {
+      await logoutApiCall({}).unwrap();
+      dispatch(logout());
+      navigate('/');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <header>
       <Navbar bg='dark' variant='dark' expand='md' collapseOnSelect>
@@ -22,15 +39,32 @@ const Header: React.FC = () => {
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='ms-auto'>
-              <LinkContainer to='/chat'>
-                <Nav.Link className='me-3 fs-4 text-light'>Chat</Nav.Link>
-              </LinkContainer>
-              <LinkContainer to='/login'>
-                <Nav.Link className='me-3 fs-4 text-light'>Login</Nav.Link>
-              </LinkContainer>
-              <LinkContainer to='/register'>
-                <Nav.Link className='me-3 fs-4 text-light'>Register</Nav.Link>
-              </LinkContainer>
+              {userInfo ? (
+                <>
+                  <LinkContainer to='/chat'>
+                    <Nav.Link className='me-3 fs-4 text-light'>Chat</Nav.Link>
+                  </LinkContainer>
+                  <NavDropdown title={userInfo.name} id='username'>
+                    <LinkContainer to='/profile'>
+                      <NavDropdown.Item>Profile</NavDropdown.Item>
+                    </LinkContainer>
+                    <NavDropdown.Item onClick={logoutHandler}>
+                      Logout
+                    </NavDropdown.Item>
+                  </NavDropdown>
+                </>
+              ) : (
+                <>
+                  <LinkContainer to='/login'>
+                    <Nav.Link className='me-3 fs-4 text-light'>Login</Nav.Link>
+                  </LinkContainer>
+                  <LinkContainer to='/register'>
+                    <Nav.Link className='me-3 fs-4 text-light'>
+                      Register
+                    </Nav.Link>
+                  </LinkContainer>
+                </>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>
