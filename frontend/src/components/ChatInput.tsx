@@ -1,31 +1,14 @@
 import React, { useState } from 'react';
 import { InputGroup, FormControl, Button } from 'react-bootstrap';
-// import { FaMicrophone, FaStop } from 'react-icons/fa';
 import VoiceRecorder from './VoiceRecorder';
 import { speechRecognitionMiddleware } from '../middleware/speechRecognitionMiddleware';
-// import 'regenerator-runtime';
-// import speech, { useSpeechRecognition } from 'react-speech-recognition';
-
+import 'regenerator-runtime';
 interface InputFieldProps {
   onSendMessage: (message: string) => void;
 }
 
 const ChatInput: React.FC<InputFieldProps> = ({ onSendMessage }) => {
   const [input, setInput] = useState('');
-  // const { listening, transcript } = useSpeechRecognition();
-
-  // const handleSpeechToText = () => {
-  //   if (!listening) {
-  //     speech.startListening();
-  //   } else {
-  //     speech.stopListening();
-  //   }
-  // };
-  // useEffect(() => {
-  //   if (!listening && transcript) {
-  //     onSendMessage(transcript);
-  //   }
-  // }, [listening, transcript]);
 
   const handleSend = () => {
     if (input.trim() !== '') {
@@ -34,9 +17,17 @@ const ChatInput: React.FC<InputFieldProps> = ({ onSendMessage }) => {
     }
   };
 
-  const handleAudioRecorded = (audioUrl: string) => {
-    // speechRecognitionMiddleware(audioUrl);
-    onSendMessage(`Audio message: ${audioUrl}`);
+  const handleAudioRecorded = async (audioUrl: string) => {
+    try {
+      const response = await fetch(audioUrl);
+      const audioBlob = await response.blob();
+
+      const transcript = await speechRecognitionMiddleware({ audioBlob });
+      onSendMessage(transcript);
+    } catch (error) {
+      console.error('Error transcribing audio:', error);
+      onSendMessage('Error processing audio message.');
+    }
   };
 
   return (
@@ -47,9 +38,6 @@ const ChatInput: React.FC<InputFieldProps> = ({ onSendMessage }) => {
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => (e.key === 'Enter' ? handleSend() : null)}
       />
-      {/* <Button variant='secondary' onClick={handleSpeechToText}>
-        {listening ? <FaStop /> : <FaMicrophone />}
-      </Button> */}
       <VoiceRecorder onAudioRecorded={handleAudioRecorded} />
       <Button variant='primary' onClick={handleSend}>
         Send
