@@ -24,7 +24,6 @@ const extractAppointmentDetails = (response: string) => {
   ] = match;
 
   const date = parseRelativeDate(dateString, timeString);
-  console.log('Date: ' + date);
 
   if (!date) {
     return {
