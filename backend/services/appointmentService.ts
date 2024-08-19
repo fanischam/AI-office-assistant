@@ -24,11 +24,12 @@ const extractAppointmentDetails = (response: string) => {
   ] = match;
 
   const date = parseRelativeDate(dateString, timeString);
+  console.log('Date: ' + date);
 
   if (!date) {
     return {
       error:
-        'Invalid date format. Please specify a format like Monday 18th of Aughust.',
+        'Invalid date format. Please specify a date like Monday 18th of August at 19:00.',
     };
   }
 
@@ -59,18 +60,6 @@ const createAppointment = async (
   } catch (error) {
     console.error('Error booking appointment:', error);
     return false;
-  }
-};
-
-const getUpcomingAppointments = async () => {
-  try {
-    const appointments = await Appointment.find({
-      date: { $gte: new Date() },
-    }).sort({ date: 1 });
-    return appointments;
-  } catch (error) {
-    console.error('Error fetching upcoming appointments:', error);
-    return [];
   }
 };
 
@@ -132,7 +121,6 @@ const getAppointmentsForNextWeek = async () => {
 export {
   extractAppointmentDetails,
   createAppointment,
-  getUpcomingAppointments,
   getAppointmentsForToday,
   getAppointmentsForTomorrow,
   getAppointmentsForThisWeek,
