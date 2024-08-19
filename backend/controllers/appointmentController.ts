@@ -2,17 +2,11 @@ import { Request, Response } from 'express';
 import asyncHandler from '../middleware/asyncHandler';
 import Appointment from '../models/appointmentModel';
 
-// @desc    GET all appointments
-// @route   GET /api/appointments
-// @access  Public
 const getAppointments = asyncHandler(async (req: Request, res: Response) => {
   const appointments = await Appointment.find({});
   res.json(appointments);
 });
 
-// @desc    Get an appointment by Id
-// @route   GET /api/appointments/:id
-// @access  Public
 const getAppointmentById = asyncHandler(async (req: Request, res: Response) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
@@ -28,9 +22,6 @@ const getAppointmentById = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-// @desc    Create a new appointment
-// @route   POST /api/appointments
-// @access  Public
 const createAppointment = asyncHandler(async (req: Request, res: Response) => {
   const { title, participant, participantPhoneNumber, date } = req.body;
 
@@ -64,9 +55,45 @@ const createAppointment = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-// @desc    Update an appointment
-// @route   PUT /api/appointments/:id
-// @access  Public
+const createAppointmentDirect = async (
+  title: string,
+  participant: string,
+  participantPhoneNumber: number,
+  date: Date
+) => {
+  const appointExists = await Appointment.findOne({ date });
+
+  if (appointExists) {
+    console.error('Appointment already exists for this date:', date);
+    throw new Error('An appointment already exists for this date');
+  }
+
+  const appointment = await Appointment.create({
+    title,
+    participant,
+    participantPhoneNumber,
+    date,
+  });
+
+  if (appointment) {
+    return {
+      _id: appointment._id,
+      title: appointment.title,
+      participant: appointment.participant,
+      participantPhoneNumber: appointment.participantPhoneNumber,
+      date: appointment.date,
+    };
+  } else {
+    console.error('Failed to create appointment with provided data:', {
+      title,
+      participant,
+      participantPhoneNumber,
+      date,
+    });
+    throw new Error('Invalid appointment data');
+  }
+};
+
 const updateAppointment = asyncHandler(async (req: Request, res: Response) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
@@ -95,9 +122,6 @@ const updateAppointment = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-// @desc    Delete an appointment
-// @route   DELETE /api/appointments/:id
-// @access  Public
 const deleteAppointment = asyncHandler(async (req: Request, res: Response) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
@@ -117,6 +141,7 @@ export {
   getAppointments,
   getAppointmentById,
   createAppointment,
+  createAppointmentDirect,
   updateAppointment,
   deleteAppointment,
 };
