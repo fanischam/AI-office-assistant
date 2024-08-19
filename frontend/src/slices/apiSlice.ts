@@ -16,12 +16,6 @@ const baseQueryWithAuth: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extra) => {
   let result = await baseQuery(args, api, extra);
-
-  if (result.error && result.error.status === 401) {
-    // Handle unauthorized access, like logging out or showing a specific message
-    // api.dispatch(logout()); // Ensure logout is imported from the authSlice
-  }
-
   return result;
 };
 
