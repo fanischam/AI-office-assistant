@@ -10,7 +10,7 @@ const extractAppointmentDetails = (response: string) => {
   if (!match) {
     return {
       error:
-        'Unable to extract appointment details. Please provide the information in the correct format.',
+        "Unable to extract appointment details. Please provide the purpose of the appointment, the participant, the participant's phone number and the date.",
     };
   }
 
@@ -28,7 +28,7 @@ const extractAppointmentDetails = (response: string) => {
   if (!date) {
     return {
       error:
-        'Invalid date format. Please specify a date like Monday 18th of August at 19:00.',
+        'Invalid date format. Please specify a date like Monday 18th of August at 7 am.',
     };
   }
 
@@ -47,7 +47,7 @@ const createAppointment = async (
   participant: string,
   participantPhoneNumber: number,
   date: Date
-) => {
+): Promise<{ message: string; appointment?: any } | { error: string }> => {
   try {
     const appointment = await createAppointmentDirect(
       title,
@@ -56,9 +56,13 @@ const createAppointment = async (
       date
     );
     return { message: 'Appointment created successfully', appointment };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error booking appointment:', error);
-    return false;
+    return {
+      error:
+        error.message ||
+        'An unknown error occurred while booking the appointment.',
+    };
   }
 };
 

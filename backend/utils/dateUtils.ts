@@ -3,7 +3,6 @@ export const parseRelativeDate = (
   timeString: string
 ): Date | null => {
   try {
-    // Define a map of month names to month numbers
     const months: { [key: string]: number } = {
       January: 0,
       February: 1,
@@ -19,8 +18,7 @@ export const parseRelativeDate = (
       December: 11,
     };
 
-    // Remove day of the week and any comma
-    const cleanedDateString = dateString.replace(/(\w+),?/, '').trim(); // Remove day name and comma
+    const cleanedDateString = dateString.replace(/(\w+),?/, '').trim();
     const dateParts = cleanedDateString.split(' ');
 
     if (dateParts.length < 3) {
@@ -29,20 +27,24 @@ export const parseRelativeDate = (
     }
 
     const [dayPart, , monthName] = dateParts;
-    const day = parseInt(dayPart.replace(/\D/g, ''), 10); // Remove any non-digit characters (e.g., "22nd" -> "22")
+    const day = parseInt(dayPart.replace(/\D/g, ''), 10);
     const month = months[monthName];
-    const year = new Date().getFullYear(); // Assume the current year
+    const year = new Date().getFullYear();
 
     if (month === undefined || isNaN(day)) {
       console.error('Invalid date format:', dateString);
       return null;
     }
 
-    // Manually create the Date object using year, month, and day
     const targetDate = new Date(year, month, day);
 
-    // Parse the time in 24-hour format (e.g., "11:00")
-    const [hours, minutes] = timeString.split(':').map(Number);
+    if (targetDate < new Date()) {
+      targetDate.setFullYear(year + 1);
+    }
+
+    const [hours, minutes] = normalizeTimeString(timeString)
+      .split(':')
+      .map(Number);
     targetDate.setHours(hours, minutes, 0, 0);
 
     console.log('Parsed date:', targetDate);
@@ -51,4 +53,33 @@ export const parseRelativeDate = (
     console.error('Error parsing date:', error);
     return null;
   }
+};
+
+const normalizeTimeString = (timeString: string): string => {
+  const amPmMatch = timeString.match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)/i);
+
+  if (amPmMatch) {
+    let [_, hours, minutes = '00', period] = amPmMatch;
+    hours = parseInt(hours, 10).toString();
+    minutes = minutes || '00';
+
+    if (period.toUpperCase() === 'PM' && hours !== '12') {
+      hours = (parseInt(hours, 10) + 12).toString();
+    } else if (period.toUpperCase() === 'AM' && hours === '12') {
+      hours = '00';
+    }
+
+    return `${hours.padStart(2, '0')}:${minutes.padEnd(2, '0')}`;
+  }
+
+  if (/^\d{1,2}(\.\d{1,2})?$/.test(timeString)) {
+    const [hours, minutes = '00'] = timeString.split('.');
+    return `${hours.padStart(2, '0')}:${minutes.padEnd(2, '0')}`;
+  }
+
+  if (/^\d{1,2}:\d{2}$/.test(timeString)) {
+    return timeString;
+  }
+
+  throw new Error('Invalid time format');
 };

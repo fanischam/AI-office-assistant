@@ -34,17 +34,12 @@ export const processUserMessage = async (
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
     let botMessage: Message = {
       text: 'You have no appointments',
       sender: 'bot',
     };
 
     const data = await response.json();
-    console.log(data);
 
     if (data.appointments) {
       botMessage.text = 'Your appointments are: ';
@@ -57,15 +52,16 @@ export const processUserMessage = async (
         )}. ${participant}'s contact phone number is ${participantPhoneNumber}.`;
       });
     } else {
-      botMessage.text =
-        data.message || data.error || data.response || 'No response';
+      botMessage.text = data.message || data.error || data.response;
     }
 
     setMessages((prevMessages) => [...prevMessages, botMessage]);
   } catch (error: any) {
     console.error('Error sending prompt to the backend', error);
     const botMessage: Message = {
-      text: 'There must be something wrong with your appointment details, please make sure that you specify a participant, his phone number, the reason of the appointment and the date in a format like Tuesday 20th of August at 11:00.',
+      text:
+        error.message ||
+        'There must be something wrong with your appointment details, please make sure that you specify a participant, his phone number, the reason of the appointment and the date in a format like Tuesday 20th of August at 11:00.',
       sender: 'bot',
     };
     setMessages((prevMessages) => [...prevMessages, botMessage]);

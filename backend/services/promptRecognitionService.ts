@@ -22,9 +22,12 @@ export const processAppointmentPrompt = async (prompt: string) => {
         participantPhoneNumber,
         date
       );
-      if (!result) {
-        throw new Error('Failed to book appointment.');
+
+      if ('error' in result) {
+        // Handle the error returned from createAppointment
+        throw new Error(result.error);
       }
+
       return { message: 'Appointment booked successfully!' };
     } else {
       throw new Error(
