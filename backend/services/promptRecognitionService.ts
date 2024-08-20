@@ -24,7 +24,6 @@ export const processAppointmentPrompt = async (prompt: string) => {
       );
 
       if ('error' in result) {
-        // Handle the error returned from createAppointment
         throw new Error(result.error);
       }
 

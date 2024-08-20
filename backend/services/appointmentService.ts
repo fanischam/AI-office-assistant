@@ -25,6 +25,10 @@ const extractAppointmentDetails = (response: string) => {
 
   const date = parseRelativeDate(dateString, timeString);
 
+  if (purpose == 'Not specified') {
+    return { error: 'Please specify the purpose of the appointment.' };
+  }
+
   if (!date) {
     return {
       error:
