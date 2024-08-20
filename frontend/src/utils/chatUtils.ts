@@ -62,10 +62,10 @@ export const processUserMessage = async (
     }
 
     setMessages((prevMessages) => [...prevMessages, botMessage]);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error sending prompt to the backend', error);
     const botMessage: Message = {
-      text: 'Sorry, something went wrong.',
+      text: 'There must be something wrong with your appointment details, please make sure that you specify a participant, his phone number, the reason of the appointment and the date in a format like Tuesday 20th of August at 11:00.',
       sender: 'bot',
     };
     setMessages((prevMessages) => [...prevMessages, botMessage]);

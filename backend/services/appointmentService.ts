@@ -32,7 +32,7 @@ const extractAppointmentDetails = (response: string) => {
     };
   }
 
-  const title = purpose ? `${participant}'s ${purpose}` : participant;
+  const title = purpose;
 
   return {
     title,
