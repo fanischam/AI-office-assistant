@@ -1,3 +1,5 @@
+import { formatDate } from './dateUtils';
+
 export interface Message {
   text: string;
   sender: 'user' | 'bot';
@@ -47,7 +49,9 @@ export const processUserMessage = async (
       appointments.forEach((appointment: Appointment) => {
         const { title, participant, participantPhoneNumber, date } =
           appointment;
-        botMessage.text += `${title} appointment with ${participant} on ${date}. ${participant}'s contact phone number is ${participantPhoneNumber}`;
+        botMessage.text += `${title} appointment with ${participant} on ${formatDate(
+          date
+        )}. ${participant}'s contact phone number is ${participantPhoneNumber}.`;
       });
     } else {
       botMessage.text =
