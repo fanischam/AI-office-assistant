@@ -22,14 +22,17 @@ export const processUserMessage = async (
   setMessages((prevMessages) => [...prevMessages, userMessage]);
 
   try {
-    const response = await fetch('http://localhost:5000/api/chatbot/prompt', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify({ prompt: message }),
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/chatbot/prompt`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ prompt: message }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
