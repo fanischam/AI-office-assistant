@@ -68,7 +68,6 @@ const getAppointmentsForToday = async () => {
 
   const end = new Date();
   end.setHours(23, 59, 59, 999);
-  console.log('Calling today');
 
   return await Appointment.find({
     date: { $gte: start, $lte: end },
