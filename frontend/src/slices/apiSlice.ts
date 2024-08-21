@@ -8,7 +8,7 @@ import {
 import { BASE_URL } from '../constants';
 import BuilderType from '../types/BuilderType';
 
-const baseQuery = fetchBaseQuery({ baseUrl: BASE_URL });
+const baseQuery = fetchBaseQuery({ baseUrl: BASE_URL, credentials: 'include' });
 
 const baseQueryWithAuth: BaseQueryFn<
   string | FetchArgs,

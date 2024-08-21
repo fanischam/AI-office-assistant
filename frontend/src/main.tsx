@@ -15,6 +15,7 @@ import RegisterScreen from './screens/RegisterScreen.tsx';
 import ChatScreen from './screens/ChatScreen.tsx';
 import { Provider } from 'react-redux';
 import { store } from './store.ts';
+import AppointmentsScreen from './screens/AppointmentScreen.tsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -23,6 +24,7 @@ const router = createBrowserRouter(
       <Route path='/login' element={<LoginScreen />} />
       <Route path='/register' element={<RegisterScreen />} />
       <Route path='/chat' element={<ChatScreen />} />
+      <Route path='/appointments' element={<AppointmentsScreen />} />
     </Route>
   )
 );
