@@ -1,23 +1,32 @@
 import { useEffect, useState } from 'react';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import { Form, Button, Row, Col, Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Loader from '../components/Loader';
-import { useProfileMutation } from '../slices/usersApiSlice';
-import { setCredentials } from '../slices/authSlice';
+import {
+  useProfileMutation,
+  useDeleteProfileMutation,
+} from '../slices/usersApiSlice';
+import { logout, setCredentials } from '../slices/authSlice';
 import { RootState } from '../types/storeTypes';
 import { PASSWORD_REGEX } from '../constants';
+import { AiOutlineExclamationCircle } from 'react-icons/ai';
 
 const ProfileScreen = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const navigate = useNavigate();
 
   const { userInfo } = useSelector((state: RootState) => state.auth);
 
   const [updateProfile, { isLoading: loadingUpdateProfile }] =
     useProfileMutation();
+  const [deleteProfile, { isLoading: isDeleting }] = useDeleteProfileMutation();
 
   useEffect(() => {
     if (userInfo) {
@@ -27,6 +36,7 @@ const ProfileScreen = () => {
   }, [userInfo?.email, userInfo?.name]);
 
   const dispatch = useDispatch();
+
   const submitHandler = async (e: any) => {
     e.preventDefault();
 
@@ -49,18 +59,36 @@ const ProfileScreen = () => {
         }).unwrap();
         dispatch(setCredentials({ ...res }));
         toast.success('Profile updated successfully');
+        setShowUpdateModal(false); // Close the modal after success
       } catch (err: any) {
         toast.error(err?.data?.message || err.error);
       }
     }
   };
 
+  const handleDeleteClick = async () => {
+    try {
+      await deleteProfile({ id: userInfo?.id }).unwrap();
+      dispatch(logout());
+      navigate('/login');
+      toast.success('Profile deleted successfully');
+      setShowDeleteModal(false); // Close the modal after success
+    } catch (error: any) {
+      toast.error(error.data?.message || 'Error deleting profile');
+    }
+  };
+
   return (
-    <Row>
-      <Col md={3} className='mx-auto my-5'>
+    <Row className=' mx-auto'>
+      <Col xs={12} md={6} className='mx-auto my-5 '>
         <h2>User Profile</h2>
 
-        <Form onSubmit={submitHandler}>
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setShowUpdateModal(true);
+          }}
+        >
           <Form.Group className='my-2' controlId='name'>
             <Form.Label>Name</Form.Label>
             <Form.Control
@@ -82,7 +110,17 @@ const ProfileScreen = () => {
           </Form.Group>
 
           <Form.Group className='my-2' controlId='password'>
-            <Form.Label>Password</Form.Label>
+            <Form.Label>
+              Password
+              <span className='password-tooltip ml-3'>
+                <AiOutlineExclamationCircle />
+                <span className='tooltip-text'>
+                  Password must be at least 8 characters long, include one
+                  uppercase letter, one lowercase letter, one digit, and one
+                  special character.
+                </span>
+              </span>
+            </Form.Label>
             <Form.Control
               type='password'
               placeholder='Enter password'
@@ -101,11 +139,74 @@ const ProfileScreen = () => {
             ></Form.Control>
           </Form.Group>
 
-          <Button type='submit' variant='primary'>
-            Update
-          </Button>
-          {loadingUpdateProfile && <Loader />}
+          <div className='d-flex justify-content-between my-4'>
+            <Button
+              type='submit'
+              variant='dark'
+              disabled={loadingUpdateProfile}
+            >
+              {loadingUpdateProfile ? <Loader /> : 'Update Profile'}
+            </Button>
+            <Button
+              variant='danger'
+              onClick={() => setShowDeleteModal(true)}
+              disabled={isDeleting}
+            >
+              {isDeleting ? <Loader /> : 'Delete Account'}
+            </Button>
+          </div>
         </Form>
+
+        {/* Update Confirmation Modal */}
+        <Modal
+          show={showUpdateModal}
+          onHide={() => setShowUpdateModal(false)}
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm Update</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Are you sure you want to update your profile with the new details?
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant='secondary'
+              onClick={() => setShowUpdateModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant='primary' onClick={submitHandler}>
+              Confirm Update
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Delete Confirmation Modal */}
+        <Modal
+          show={showDeleteModal}
+          onHide={() => setShowDeleteModal(false)}
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm Deletion</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Are you sure you want to delete your account? This action cannot be
+            undone.
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant='secondary'
+              onClick={() => setShowDeleteModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant='danger' onClick={handleDeleteClick}>
+              Confirm Deletion
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </Col>
     </Row>
   );
