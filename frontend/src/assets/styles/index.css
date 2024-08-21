@@ -52,3 +52,13 @@ body {
   visibility: visible;
   opacity: 1;
 }
+
+.nav-pills .nav-link {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 767px) {
+  .nav-pills {
+    text-align: center;
+  }
+}
