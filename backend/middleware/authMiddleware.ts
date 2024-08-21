@@ -3,7 +3,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import asyncHandler from './asyncHandler';
 import User from '../models/userModel';
 
-interface CustomRequest extends Request {
+export interface CustomRequest extends Request {
   user?: typeof User.prototype;
 }
 
