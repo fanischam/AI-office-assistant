@@ -3,10 +3,12 @@ import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import { Card } from 'react-bootstrap';
 import { processUserMessage, Message as MessageType } from '../utils/chatUtils';
+import { useSendPromptMutation } from '../slices/chatbotApiSlice';
 
 const ChatWindow: React.FC = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [sendPrompt] = useSendPromptMutation();
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -19,7 +21,7 @@ const ChatWindow: React.FC = () => {
   }, [messages]);
 
   const handleSendMessage = (message: string) => {
-    processUserMessage(message, setMessages);
+    processUserMessage(message, setMessages, sendPrompt);
   };
 
   return (

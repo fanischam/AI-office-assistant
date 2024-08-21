@@ -1,3 +1,4 @@
+import { useSendPromptMutation } from '../slices/chatbotApiSlice';
 import { formatDate } from './dateUtils';
 
 export interface Message {
@@ -14,7 +15,8 @@ interface Appointment {
 
 export const processUserMessage = async (
   message: string,
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
+  sendPrompt: ReturnType<typeof useSendPromptMutation>[0]
 ) => {
   if (!message) return;
 
@@ -22,28 +24,16 @@ export const processUserMessage = async (
   setMessages((prevMessages) => [...prevMessages, userMessage]);
 
   try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/chatbot/prompt`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ prompt: message }),
-      }
-    );
+    const response = await sendPrompt({ prompt: message }).unwrap();
 
     let botMessage: Message = {
       text: 'You have no appointments',
       sender: 'bot',
     };
 
-    const data = await response.json();
-
-    if (data.appointments) {
+    if (response.appointments) {
       botMessage.text = 'Your appointments are: ';
-      const appointments = data.appointments;
+      const appointments = response.appointments;
       appointments.forEach((appointment: Appointment) => {
         const { title, participant, participantPhoneNumber, date } =
           appointment;
@@ -52,7 +42,7 @@ export const processUserMessage = async (
         )}. ${participant}'s contact phone number is ${participantPhoneNumber}.`;
       });
     } else {
-      botMessage.text = data.message || data.error || data.response;
+      botMessage.text = response.message || response.error || response.response;
     }
 
     setMessages((prevMessages) => [...prevMessages, botMessage]);
