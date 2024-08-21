@@ -8,6 +8,7 @@ import {
   useDeleteAppointmentMutation,
 } from '../slices/appointmentsApiSlice';
 import Loader from '../components/Loader';
+import { formatDateForInput } from '../utils/dateUtils';
 
 interface Appointment {
   _id: string;
@@ -18,7 +19,11 @@ interface Appointment {
 }
 
 const AppointmentsScreen: React.FC = () => {
-  const { data: appointments, isLoading, refetch } = useGetAppointmentsQuery();
+  const {
+    data: appointments,
+    isLoading,
+    refetch,
+  } = useGetAppointmentsQuery({});
   const [createAppointment] = useCreateAppointmentMutation();
   const [updateAppointment] = useUpdateAppointmentMutation();
   const [deleteAppointment] = useDeleteAppointmentMutation();
@@ -34,7 +39,14 @@ const AppointmentsScreen: React.FC = () => {
     appointment?: Appointment
   ) => {
     setModalType(type);
-    setCurrentAppointment(appointment || {});
+    setCurrentAppointment(
+      appointment
+        ? {
+            ...appointment,
+            date: formatDateForInput(appointment.date),
+          }
+        : {}
+    );
     setShowModal(true);
   };
 
@@ -44,6 +56,19 @@ const AppointmentsScreen: React.FC = () => {
   };
 
   const handleSave = async () => {
+    const { title, participant, participantPhoneNumber, date } =
+      currentAppointment;
+
+    if (!title || !participant || !participantPhoneNumber || !date) {
+      toast.error('All fields are required');
+      return;
+    }
+
+    if (participantPhoneNumber.toString().length !== 10) {
+      toast.error('Phone number must be exactly 10 digits');
+      return;
+    }
+
     try {
       if (modalType === 'create') {
         await createAppointment(currentAppointment).unwrap();
@@ -128,7 +153,7 @@ const AppointmentsScreen: React.FC = () => {
         <Modal.Body>
           <Form>
             <Form.Group controlId='title'>
-              <Form.Label>Title</Form.Label>
+              <Form.Label>Title *</Form.Label>
               <Form.Control
                 type='text'
                 value={currentAppointment.title || ''}
@@ -141,7 +166,7 @@ const AppointmentsScreen: React.FC = () => {
               />
             </Form.Group>
             <Form.Group controlId='participant' className='mt-2'>
-              <Form.Label>Participant</Form.Label>
+              <Form.Label>Participant *</Form.Label>
               <Form.Control
                 type='text'
                 value={currentAppointment.participant || ''}
@@ -154,7 +179,7 @@ const AppointmentsScreen: React.FC = () => {
               />
             </Form.Group>
             <Form.Group controlId='participantPhoneNumber' className='mt-2'>
-              <Form.Label>Phone Number</Form.Label>
+              <Form.Label>Phone Number *</Form.Label>
               <Form.Control
                 type='text'
                 value={
@@ -172,7 +197,7 @@ const AppointmentsScreen: React.FC = () => {
               />
             </Form.Group>
             <Form.Group controlId='date' className='mt-2'>
-              <Form.Label>Date</Form.Label>
+              <Form.Label>Date *</Form.Label>
               <Form.Control
                 type='datetime-local'
                 value={currentAppointment.date || ''}
