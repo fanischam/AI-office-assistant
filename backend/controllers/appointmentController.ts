@@ -72,7 +72,7 @@ const createAppointmentDirect = async (
   participant: string,
   participantPhoneNumber: number,
   date: Date,
-  userId: mongoose.Schema.Types.ObjectId
+  userId: string
 ) => {
   const appointExists = await Appointment.findOne({ date, user: userId });
 

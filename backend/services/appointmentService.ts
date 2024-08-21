@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { createAppointmentDirect } from '../controllers/appointmentController';
 import Appointment from '../models/appointmentModel';
 import { parseRelativeDate } from '../utils/dateUtils';
@@ -30,9 +30,9 @@ const extractAppointmentDetails = (response: string) => {
     return { error: 'Please specify the purpose of the appointment.' };
   }
 
-  if (participantPhoneNumber.length !== 10) {
-    return { error: 'Phone number must have 10 digits.' };
-  }
+  // if (participantPhoneNumber.length !== 10) {
+  //   return { error: 'Phone number must have 10 digits.' };
+  // }
 
   if (!date) {
     return {
@@ -59,13 +59,12 @@ const createAppointment = async (
   userId: string
 ): Promise<{ message: string; appointment?: any } | { error: string }> => {
   try {
-    const userObjectId = new mongoose.Schema.Types.ObjectId(userId);
     const appointment = await createAppointmentDirect(
       title,
       participant,
       participantPhoneNumber,
       date,
-      userObjectId
+      userId
     );
     return { message: 'Appointment created successfully', appointment };
   } catch (error: any) {

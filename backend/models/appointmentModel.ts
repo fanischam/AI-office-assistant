@@ -5,7 +5,7 @@ interface IAppointment extends Document {
   participant: string;
   participantPhoneNumber: number;
   date: Date;
-  user: mongoose.Schema.Types.ObjectId;
+  user: string;
 }
 
 const appointmentSchema = new mongoose.Schema<IAppointment>(
@@ -27,9 +27,8 @@ const appointmentSchema = new mongoose.Schema<IAppointment>(
       required: true,
     },
     user: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       required: true,
-      ref: 'User',
     },
   },
   { timestamps: true }
