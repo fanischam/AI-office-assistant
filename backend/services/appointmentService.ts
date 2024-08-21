@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { createAppointmentDirect } from '../controllers/appointmentController';
 import Appointment from '../models/appointmentModel';
 import { parseRelativeDate } from '../utils/dateUtils';
@@ -54,14 +55,17 @@ const createAppointment = async (
   title: string,
   participant: string,
   participantPhoneNumber: number,
-  date: Date
+  date: Date,
+  userId: string
 ): Promise<{ message: string; appointment?: any } | { error: string }> => {
   try {
+    const userObjectId = new mongoose.Schema.Types.ObjectId(userId);
     const appointment = await createAppointmentDirect(
       title,
       participant,
       participantPhoneNumber,
-      date
+      date,
+      userObjectId
     );
     return { message: 'Appointment created successfully', appointment };
   } catch (error: any) {
@@ -74,7 +78,9 @@ const createAppointment = async (
   }
 };
 
-const getAppointmentsForToday = async () => {
+const getAppointmentsForToday = async (userId: string) => {
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+
   const start = new Date();
   start.setHours(0, 0, 0, 0);
 
@@ -82,11 +88,14 @@ const getAppointmentsForToday = async () => {
   end.setHours(23, 59, 59, 999);
 
   return await Appointment.find({
+    user: userObjectId,
     date: { $gte: start, $lte: end },
   }).sort({ date: 1 });
 };
 
-const getAppointmentsForTomorrow = async () => {
+const getAppointmentsForTomorrow = async (userId: string) => {
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+
   const start = new Date();
   start.setDate(start.getDate() + 1);
   start.setHours(0, 0, 0, 0);
@@ -96,11 +105,14 @@ const getAppointmentsForTomorrow = async () => {
   end.setHours(23, 59, 59, 999);
 
   return await Appointment.find({
+    user: userObjectId,
     date: { $gte: start, $lte: end },
   }).sort({ date: 1 });
 };
 
-const getAppointmentsForThisWeek = async () => {
+const getAppointmentsForThisWeek = async (userId: string) => {
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+
   const start = new Date();
   start.setDate(start.getDate());
   start.setHours(0, 0, 0, 0);
@@ -110,11 +122,14 @@ const getAppointmentsForThisWeek = async () => {
   end.setHours(23, 59, 59, 999);
 
   return await Appointment.find({
+    user: userObjectId,
     date: { $gte: start, $lte: end },
   }).sort({ date: 1 });
 };
 
-const getAppointmentsForNextWeek = async () => {
+const getAppointmentsForNextWeek = async (userId: string) => {
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+
   const start = new Date();
   start.setDate(start.getDate() + (7 - start.getDay()));
   start.setHours(0, 0, 0, 0);
@@ -124,6 +139,7 @@ const getAppointmentsForNextWeek = async () => {
   end.setHours(23, 59, 59, 999);
 
   return await Appointment.find({
+    user: userObjectId,
     date: { $gte: start, $lte: end },
   }).sort({ date: 1 });
 };

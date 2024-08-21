@@ -8,7 +8,10 @@ import {
   getAppointmentsForThisWeek,
 } from './appointmentService';
 
-export const processAppointmentPrompt = async (prompt: string) => {
+export const processAppointmentPrompt = async (
+  prompt: string,
+  userId: string
+) => {
   const gptResponse = await getGPTResponse(prompt);
 
   if (gptResponse.toLowerCase().includes('book appointment')) {
@@ -20,7 +23,8 @@ export const processAppointmentPrompt = async (prompt: string) => {
         title,
         participant,
         participantPhoneNumber,
-        date
+        date,
+        userId
       );
 
       if ('error' in result) {
@@ -45,22 +49,22 @@ export const processAppointmentPrompt = async (prompt: string) => {
   };
 
   if (includesKeywords(keywordsForToday, prompt)) {
-    const appointmentsForToday = await getAppointmentsForToday();
+    const appointmentsForToday = await getAppointmentsForToday(userId);
     return { appointments: appointmentsForToday };
   }
 
   if (includesKeywords(keywordsForTomorrow, prompt)) {
-    const appointmentsForTomorrow = await getAppointmentsForTomorrow();
+    const appointmentsForTomorrow = await getAppointmentsForTomorrow(userId);
     return { appointments: appointmentsForTomorrow };
   }
 
   if (includesKeywords(keywordsForThisWeek, prompt)) {
-    const appointmentsForThisWeek = await getAppointmentsForThisWeek();
+    const appointmentsForThisWeek = await getAppointmentsForThisWeek(userId);
     return { appointments: appointmentsForThisWeek };
   }
 
   if (includesKeywords(keywordsForNextWeek, prompt)) {
-    const appointmentsForNextWeek = await getAppointmentsForNextWeek();
+    const appointmentsForNextWeek = await getAppointmentsForNextWeek(userId);
     return { appointments: appointmentsForNextWeek };
   }
 

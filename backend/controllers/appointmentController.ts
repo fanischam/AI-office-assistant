@@ -1,67 +1,80 @@
 import { Request, Response } from 'express';
 import asyncHandler from '../middleware/asyncHandler';
 import Appointment from '../models/appointmentModel';
+import { CustomRequest } from '../middleware/authMiddleware';
+import mongoose from 'mongoose';
 
-const getAppointments = asyncHandler(async (req: Request, res: Response) => {
-  const appointments = await Appointment.find({});
-  res.json(appointments);
-});
+// Get all appointments for the logged-in user
+const getAppointments = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    const userId = req.user._id;
+    const appointments = await Appointment.find({ user: userId });
+    res.json(appointments);
+  }
+);
 
-const getAppointmentById = asyncHandler(async (req: Request, res: Response) => {
-  try {
-    const appointment = await Appointment.findById(req.params.id);
+// Get a specific appointment by ID, only if it belongs to the logged-in user
+const getAppointmentById = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    const userId = req.user._id;
+    const appointment = await Appointment.findOne({
+      _id: req.params.id,
+      user: userId,
+    });
     if (appointment) {
       res.json(appointment);
     } else {
       res.status(404).json({ message: 'Appointment not found' });
+    }
+  }
+);
+
+// Create a new appointment associated with the logged-in user
+const createAppointment = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    const userId = req.user._id;
+    const { title, participant, participantPhoneNumber, date } = req.body;
+
+    const appointExists = await Appointment.findOne({ date, user: userId });
+
+    if (appointExists) {
+      res.status(400).json({
+        message: 'An appointment already exists for this date',
+      });
       return;
     }
-  } catch (error) {
-    res.status(404).json({ message: 'Appointment not found' });
-    return;
-  }
-});
 
-const createAppointment = asyncHandler(async (req: Request, res: Response) => {
-  const { title, participant, participantPhoneNumber, date } = req.body;
-
-  const appointExists = await Appointment.findOne({ date });
-
-  if (appointExists) {
-    res.status(400).json({
-      message: 'An appointment already exists for this date',
+    const appointment = await Appointment.create({
+      title,
+      participant,
+      participantPhoneNumber,
+      date,
+      user: userId, // Associate the appointment with the user
     });
-    return;
-  }
 
-  const appointment = await Appointment.create({
-    title,
-    participant,
-    participantPhoneNumber,
-    date,
-  });
-
-  if (appointment) {
-    res.status(201).json({
-      _id: appointment._id,
-      title: appointment.title,
-      participant: appointment.participant,
-      participantPhoneNumber: appointment.participantPhoneNumber,
-      date: appointment.date,
-    });
-  } else {
-    res.status(400).json({ message: 'Invalid appointment data' });
-    return;
+    if (appointment) {
+      res.status(201).json({
+        _id: appointment._id,
+        title: appointment.title,
+        participant: appointment.participant,
+        participantPhoneNumber: appointment.participantPhoneNumber,
+        date: appointment.date,
+        user: appointment.user,
+      });
+    } else {
+      res.status(400).json({ message: 'Invalid appointment data' });
+    }
   }
-});
+);
 
 const createAppointmentDirect = async (
   title: string,
   participant: string,
   participantPhoneNumber: number,
-  date: Date
+  date: Date,
+  userId: mongoose.Schema.Types.ObjectId
 ) => {
-  const appointExists = await Appointment.findOne({ date });
+  const appointExists = await Appointment.findOne({ date, user: userId });
 
   if (appointExists) {
     console.error('Appointment already exists for this date:', date);
@@ -73,6 +86,7 @@ const createAppointmentDirect = async (
     participant,
     participantPhoneNumber,
     date,
+    user: userId, // Associate the appointment with the user
   });
 
   if (appointment) {
@@ -82,6 +96,7 @@ const createAppointmentDirect = async (
       participant: appointment.participant,
       participantPhoneNumber: appointment.participantPhoneNumber,
       date: appointment.date,
+      user: appointment.user,
     };
   } else {
     console.error('Failed to create appointment with provided data:', {
@@ -94,9 +109,14 @@ const createAppointmentDirect = async (
   }
 };
 
-const updateAppointment = asyncHandler(async (req: Request, res: Response) => {
-  try {
-    const appointment = await Appointment.findById(req.params.id);
+const updateAppointment = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    const userId = req.user._id;
+    const appointment = await Appointment.findOne({
+      _id: req.params.id,
+      user: userId,
+    });
+
     if (appointment) {
       appointment.title = req.body.title || appointment.title;
       appointment.participant = req.body.participant || appointment.participant;
@@ -111,31 +131,30 @@ const updateAppointment = asyncHandler(async (req: Request, res: Response) => {
         participant: updatedAppointment.participant,
         participantPhoneNumber: updatedAppointment.participantPhoneNumber,
         date: updatedAppointment.date,
+        user: updatedAppointment.user,
       });
     } else {
       res.status(404).json({ message: 'Appointment not found' });
-      return;
     }
-  } catch (error) {
-    res.status(404).json({ message: 'Appointment not found' });
-    return;
   }
-});
+);
 
-const deleteAppointment = asyncHandler(async (req: Request, res: Response) => {
-  try {
-    const appointment = await Appointment.findById(req.params.id);
+const deleteAppointment = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    const userId = req.user._id;
+    const appointment = await Appointment.findOne({
+      _id: req.params.id,
+      user: userId,
+    });
+
     if (appointment) {
       await Appointment.deleteOne({ _id: appointment._id });
       res.json({ message: 'Appointment deleted' });
     } else {
       res.status(404).json({ message: 'Appointment not found' });
     }
-  } catch (error) {
-    res.status(404).json({ message: 'Appointment not found' });
-    return;
   }
-});
+);
 
 export {
   getAppointments,
