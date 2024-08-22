@@ -54,6 +54,13 @@ export const processUserMessage = async (
         'There must be something wrong with your appointment details, please make sure that you specify a participant, his phone number, the reason of the appointment and the date in a format like Tuesday 20th of August at 11:00.',
       sender: 'bot',
     };
+
+    if (error?.data?.error) {
+      botMessage.text = error.data.error;
+    } else if (error?.data?.message) {
+      botMessage.text = error.data.message;
+    }
+
     setMessages((prevMessages) => [...prevMessages, botMessage]);
   }
 };

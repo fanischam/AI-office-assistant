@@ -5,7 +5,7 @@ import { parseRelativeDate } from '../utils/dateUtils';
 
 const extractAppointmentDetails = (response: string) => {
   const match = response.match(
-    /- Appointment with:\s*(.+)\n- Purpose:\s*(.+)\n- Date:\s*(.+)\n- Time:\s*(.+)\n- Contact Number:\s*(\d)/
+    /- Appointment with:\s*(.+)\n- Purpose:\s*(.+)\n- Date:\s*(.+)\n- Time:\s*(.+)\n- Contact Number:\s*(\d+)/
   );
 
   if (!match) {
@@ -26,13 +26,13 @@ const extractAppointmentDetails = (response: string) => {
 
   const date = parseRelativeDate(dateString, timeString);
 
-  if (purpose == 'Not specified') {
+  if (purpose === 'Not specified') {
     return { error: 'Please specify the purpose of the appointment.' };
   }
 
-  // if (participantPhoneNumber.length !== 10) {
-  //   return { error: 'Phone number must have 10 digits.' };
-  // }
+  if (participantPhoneNumber.length !== 10) {
+    return { error: 'Phone number must have 10 digits.' };
+  }
 
   if (!date) {
     return {
