@@ -17,6 +17,7 @@ const ChatWindow: React.FC = () => {
   };
 
   useEffect(() => {
+    if (messages.length == 0) return;
     scrollToBottom();
   }, [messages]);
 
