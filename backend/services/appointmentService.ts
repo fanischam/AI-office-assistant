@@ -143,11 +143,43 @@ const getAppointmentsForNextWeek = async (userId: string) => {
   }).sort({ date: 1 });
 };
 
-export {
-  extractAppointmentDetails,
-  createAppointment,
-  getAppointmentsForToday,
-  getAppointmentsForTomorrow,
-  getAppointmentsForThisWeek,
-  getAppointmentsForNextWeek,
+const getAppointments = async (
+  period: 'today' | 'tomorrow' | 'thisWeek' | 'nextWeek',
+  userId: string
+) => {
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+  const start = new Date();
+  const end = new Date();
+
+  switch (period) {
+    case 'today':
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      break;
+    case 'tomorrow':
+      start.setDate(start.getDate() + 1);
+      start.setHours(0, 0, 0, 0);
+      end.setDate(end.getDate() + 1);
+      end.setHours(23, 59, 59, 999);
+      break;
+    case 'thisWeek':
+      start.setDate(start.getDate() - start.getDay() + 1);
+      start.setHours(0, 0, 0, 0);
+      end.setDate(start.getDate() + 6);
+      end.setHours(23, 59, 59, 999);
+      break;
+    case 'nextWeek':
+      start.setDate(start.getDate() + (7 - start.getDay() + 1));
+      start.setHours(0, 0, 0, 0);
+      end.setDate(start.getDate() + 6);
+      end.setHours(23, 59, 59, 999);
+      break;
+  }
+
+  return await Appointment.find({
+    user: userObjectId,
+    date: { $gte: start, $lte: end },
+  }).sort({ date: 1 });
 };
+
+export { extractAppointmentDetails, createAppointment, getAppointments };

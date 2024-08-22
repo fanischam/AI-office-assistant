@@ -2,10 +2,7 @@ import { getGPTResponse } from '../middleware/openaiMiddleware';
 import {
   extractAppointmentDetails,
   createAppointment,
-  getAppointmentsForToday,
-  getAppointmentsForTomorrow,
-  getAppointmentsForNextWeek,
-  getAppointmentsForThisWeek,
+  getAppointments,
 } from './appointmentService';
 
 export const processAppointmentPrompt = async (
@@ -39,33 +36,30 @@ export const processAppointmentPrompt = async (
     }
   }
 
-  const keywordsForToday = ['appointments', 'today'];
-  const keywordsForTomorrow = ['appointments', 'tomorrow'];
-  const keywordsForThisWeek = ['appointments', 'this', 'week'];
-  const keywordsForNextWeek = ['appointments', 'next', 'week'];
+  const keywordsForPeriods = {
+    today: ['appointments', 'today'],
+    tomorrow: ['appointments', 'tomorrow'],
+    thisWeek: ['appointments', 'this', 'week'],
+    nextWeek: ['appointments', 'next', 'week'],
+  };
 
   const includesKeywords = (keywords: string[], text: string) => {
     return keywords.every((keyword) => text.toLowerCase().includes(keyword));
   };
 
-  if (includesKeywords(keywordsForToday, prompt)) {
-    const appointmentsForToday = await getAppointmentsForToday(userId);
-    return { appointments: appointmentsForToday };
-  }
-
-  if (includesKeywords(keywordsForTomorrow, prompt)) {
-    const appointmentsForTomorrow = await getAppointmentsForTomorrow(userId);
-    return { appointments: appointmentsForTomorrow };
-  }
-
-  if (includesKeywords(keywordsForThisWeek, prompt)) {
-    const appointmentsForThisWeek = await getAppointmentsForThisWeek(userId);
-    return { appointments: appointmentsForThisWeek };
-  }
-
-  if (includesKeywords(keywordsForNextWeek, prompt)) {
-    const appointmentsForNextWeek = await getAppointmentsForNextWeek(userId);
-    return { appointments: appointmentsForNextWeek };
+  for (const period in keywordsForPeriods) {
+    if (
+      includesKeywords(
+        keywordsForPeriods[period as keyof typeof keywordsForPeriods],
+        prompt
+      )
+    ) {
+      const appointments = await getAppointments(
+        period as keyof typeof keywordsForPeriods,
+        userId
+      );
+      return { appointments };
+    }
   }
 
   return {
