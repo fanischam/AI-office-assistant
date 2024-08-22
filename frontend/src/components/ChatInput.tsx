@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { InputGroup, FormControl, Button } from 'react-bootstrap';
 import VoiceRecorder from './VoiceRecorder';
 import { speechRecognitionMiddleware } from '../middleware/speechRecognitionMiddleware';
-import 'regenerator-runtime';
+
 interface InputFieldProps {
   onSendMessage: (message: string) => void;
 }
