@@ -14,6 +14,8 @@ const getGPTResponse = async (prompt: string): Promise<string> => {
       - Date: [Date]
       - Time: [Time]
       - Contact Number: [Contact Number]
+
+      In case that details are not specified, leave them empty.
   
       Here is the user's question: "${prompt}"
     `;
