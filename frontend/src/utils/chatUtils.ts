@@ -1,3 +1,4 @@
+import { textToSpeech } from '../middlewares/textToSpeechMiddleware';
 import { useSendPromptMutation } from '../slices/chatbotApiSlice';
 import { formatDate } from './dateUtils';
 
@@ -45,6 +46,8 @@ export const processUserMessage = async (
       botMessage.text = response.message || response.error || response.response;
     }
 
+    textToSpeech(botMessage.text);
+
     setMessages((prevMessages) => [...prevMessages, botMessage]);
   } catch (error: any) {
     console.error('Error sending prompt to the backend', error);
@@ -57,8 +60,10 @@ export const processUserMessage = async (
 
     if (error?.data?.error) {
       botMessage.text = error.data.error;
+      textToSpeech(error.data.error);
     } else if (error?.data?.message) {
       botMessage.text = error.data.message;
+      textToSpeech(error.data.message);
     }
 
     setMessages((prevMessages) => [...prevMessages, botMessage]);
